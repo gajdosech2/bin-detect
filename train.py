@@ -50,6 +50,8 @@ def train(args):
     print("Starting at epoch {}".format(start_epoch))
     print("Running till epoch {}".format(args.epochs))
 
+    train_loss_all = []
+    val_loss_all = []
     for e in range(start_epoch, args.epochs):
         print("Starting epoch: ", e)
         for sample in train_loader:
@@ -77,6 +79,7 @@ def train(args):
             loss.backward()
             optimizer.step()
 
+        train_loss_all.append(loss_running)
         with torch.no_grad():
             val_losses = []
             val_losses_t = []
@@ -107,16 +110,22 @@ def train(args):
             print("medians - \t val loss: {} \t z loss: {} \t y loss: {} \t t loss: {}"
                   .format(np.median(val_losses), np.median(val_losses_z), np.median(val_losses_y), np.median(val_losses_t)))
 
+            val_loss_all.append(np.mean(val_losses))
+
         if args.dump_every != 0 and (e) % args.dump_every == 0:
             print("Saving checkpoint")
             if not os.path.isdir('checkpoints/'):
                 os.mkdir('checkpoints/')
             torch.save(model.state_dict(), 'checkpoints/{:03d}.pth'.format(e))
 
+    np.set_printoptions(suppress=True)
+    np.savetxt('train_err.out', train_loss_all, delimiter=',')
+    np.savetxt('val_err.out', val_loss_all, delimiter=',')
+
 
 if __name__ == '__main__':
     """
-    Example usage: python train.py -iw 1032 -ih 772 -b 8 -e 500 -de 10 -lr 1e-3 -bb resnet34 -w 0.1 /path/to/MLBinsDataset/EXR/dataset.json
+    Example usage: python train.py -iw 1032 -ih 772 -b 12 -e 500 -de 10 -lr 1e-3 -bb resnet34 -w 0.1 /path/to/MLBinsDataset/EXR/dataset.json
     """
     args = parse_command_line()
     train(args)

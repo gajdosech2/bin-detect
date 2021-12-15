@@ -35,9 +35,12 @@ def generate_dataset(path, ignore_bad=True, ignore_bad_det=False):
     for dir in dirs:
         if ignore_bad:
             good_txt_files = [f for f in os.listdir(os.path.join(path, dir)) if
-                              '.txt' in f and 'pred' not in f and 'bad' not in f and 'catas' not in f and 'ish' not in f]
+                              '.txt' in f
+                              and not any(sub in f for sub in ['bad', 'catas', 'ish', 'pred', 'icp'])]
         else:
-            good_txt_files = [f for f in os.listdir(os.path.join(path, dir)) if '.txt' in f and 'pred' not in f]
+            good_txt_files = [f for f in os.listdir(os.path.join(path, dir)) if '.txt' in f
+                              and 'pred' not in f
+                              and 'icp' not in f]
         for txt_file in good_txt_files:
             txt_path = os.path.join(path, dir, txt_file)
             transform = np.loadtxt(txt_path, max_rows=1).reshape([4, 4]).T

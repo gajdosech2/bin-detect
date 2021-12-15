@@ -3,7 +3,7 @@ import glob
 import os
 
 
-def visualize(args):
+def visualize(args, prefix='prediction_'):
     txt_files = glob.iglob(args.path + '/**/*.txt', recursive=True)
     good_txt_files = [f for f in txt_files if
                       'bad' not in f and 'catas' not in f and 'ish' not in f]
@@ -12,7 +12,7 @@ def visualize(args):
         return
     for file in good_txt_files:
         path, txt_file = os.path.split(file)
-        trans_file = txt_file if args.ground_truth else 'prediction_' + txt_file
+        trans_file = txt_file if args.ground_truth else prefix + txt_file
         if not os.path.isfile(path + '/' + trans_file):
             continue
         cogs_file = txt_file[:-4] + '.cogs'

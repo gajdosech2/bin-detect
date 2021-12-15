@@ -15,9 +15,6 @@ def infer(args, export_to_folder=False):
     model = load_model(args).eval()
 
     dir_path = os.path.dirname(args.path)
-    export_path = dir_path + 'Inference'
-    if not os.path.isdir(export_path):
-        os.mkdir(export_path)
 
     val_dataset = Dataset(args.path, 'val', args.input_width, args.input_height, preload=not args.no_preload)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
@@ -66,6 +63,10 @@ def infer(args, export_to_folder=False):
                     """
                     Copies .txt predictions, .cogs scans and bin .stl into standalone folder with Inference suffix
                     """
+                    export_path = dir_path + 'Inference'
+                    if not os.path.isdir(export_path):
+                        os.mkdir(export_path)
+
                     if not os.path.isdir(os.path.join(export_path, txt_dir)):
                         os.mkdir(os.path.join(export_path, txt_dir))
 
